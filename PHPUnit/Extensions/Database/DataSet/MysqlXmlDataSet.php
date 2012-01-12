@@ -93,6 +93,11 @@ class PHPUnit_Extensions_Database_DataSet_MysqlXmlDataSet extends PHPUnit_Extens
 
                 foreach ($tableColumns[$tableName] as $columnName) {
                     $fields          = $rowElement->xpath('./field[@name="' . $columnName . '"]');
+
+                    if (!isset($fields[0])) {
+                        continue;
+                    }
+
                     $column          = $fields[0];
                     $attr            = $column->attributes('http://www.w3.org/2001/XMLSchema-instance');
 
