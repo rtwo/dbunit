@@ -2,7 +2,7 @@
 /**
  * PHPUnit
  *
- * Copyright (c) 2002-2011, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+ * Copyright (c) 2002-2014, Sebastian Bergmann <sebastian@phpunit.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@
  *
  * @package    DbUnit
  * @author     Mike Lively <m@digitalsandwich.com>
- * @copyright  2002-2011 Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright  2002-2014 Sebastian Bergmann <sebastian@phpunit.de>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      File available since Release 1.0.0
  */
@@ -45,8 +45,8 @@
 /**
  * @package    DbUnit
  * @author     Mike Lively <m@digitalsandwich.com>
- * @copyright  2002-2011 Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright  2002-2014 Sebastian Bergmann <sebastian@phpunit.de>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      File available since Release 1.0.0
  */
@@ -118,17 +118,22 @@ class Extensions_Database_DataSet_QueryTableTest extends PHPUnit_Framework_TestC
         $expected_table = new PHPUnit_Extensions_Database_DataSet_DefaultTable(new PHPUnit_Extensions_Database_DataSet_DefaultTableMetaData('table1', array('col1', 'col2', 'col3')));
         $expected_table->addRow(array('col1' => 'value1', 'col2' => 'value2', 'col3' => 'value3'));
         $expected_table->addRow(array('col1' => 'value4', 'col2' => 'value5', 'col3' => 'value6'));
-        $this->assertTrue($this->table->assertEquals($expected_table));
+        $this->assertTrue($this->table->matches($expected_table));
     }
 
     public function testAssertEqualsFails()
     {
-        $this->setExpectedException('PHPUnit_Extensions_Database_Exception', 'Expected row count of 2, has a row count of 3');
-
         $expected_table = new PHPUnit_Extensions_Database_DataSet_DefaultTable(new PHPUnit_Extensions_Database_DataSet_DefaultTableMetaData('table1', array('col1', 'col2', 'col3')));
         $expected_table->addRow(array('col1' => 'value1', 'col2' => 'value2', 'col3' => 'value3'));
         $expected_table->addRow(array('col1' => 'value4', 'col2' => 'value5', 'col3' => 'value6'));
         $expected_table->addRow(array('col1' => 'value7', 'col2' => 'value8', 'col3' => 'value9'));
-        $this->table->assertEquals($expected_table);
+        $this->assertFalse($this->table->matches($expected_table));
+    }
+
+    public function testAssertRowContains()
+    {
+        $this->assertTrue($this->table->assertContainsRow(
+            array('col1' => 'value1', 'col2' => 'value2', 'col3' => 'value3')
+        ));
     }
 }

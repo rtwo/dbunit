@@ -2,7 +2,7 @@
 /**
  * PHPUnit
  *
- * Copyright (c) 2002-2011, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+ * Copyright (c) 2002-2014, Sebastian Bergmann <sebastian@phpunit.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@
  *
  * @package    DbUnit
  * @author     Mike Lively <m@digitalsandwich.com>
- * @copyright  2002-2011 Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright  2002-2014 Sebastian Bergmann <sebastian@phpunit.de>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      File available since Release 1.0.0
  */
@@ -47,8 +47,8 @@
  *
  * @package    DbUnit
  * @author     Mike Lively <m@digitalsandwich.com>
- * @copyright  2010 Mike Lively <m@digitalsandwich.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright  2010-2014 Mike Lively <m@digitalsandwich.com>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @version    Release: @package_version@
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 1.0.0
@@ -160,15 +160,14 @@ class PHPUnit_Extensions_Database_DataSet_ReplacementTable implements PHPUnit_Ex
      *
      * @param PHPUnit_Extensions_Database_DataSet_ITable $other
      */
-    public function assertEquals(PHPUnit_Extensions_Database_DataSet_ITable $other)
+    public function matches(PHPUnit_Extensions_Database_DataSet_ITable $other)
     {
         $thisMetaData  = $this->getTableMetaData();
         $otherMetaData = $other->getTableMetaData();
 
-        $thisMetaData->assertEquals($otherMetaData);
-
-        if ($this->getRowCount() != $other->getRowCount()) {
-            throw new PHPUnit_Extensions_Database_Exception("Expected row count of {$this->getRowCount()}, has a row count of {$other->getRowCount()}");
+        if (!$thisMetaData->matches($otherMetaData) ||
+            $this->getRowCount() != $other->getRowCount()) {
+            return FALSE;
         }
 
         $columns  = $thisMetaData->getColumns();
@@ -176,8 +175,8 @@ class PHPUnit_Extensions_Database_DataSet_ReplacementTable implements PHPUnit_Ex
 
         for ($i = 0; $i < $rowCount; $i++) {
             foreach ($columns as $columnName) {
-                if ($this->getValue($i, $columnName) != $other->getValue($i, $columnName)) {
-                    throw new PHPUnit_Extensions_Database_Exception("Expected value of {$this->getValue($i, $columnName)} for row {$i} column {$columnName}, has a value of {$other->getValue($i, $columnName)}");
+                if ($this->getValue($i, $columnName) !== $other->getValue($i, $columnName)) {
+                    return FALSE;
                 }
             }
         }
@@ -235,7 +234,7 @@ class PHPUnit_Extensions_Database_DataSet_ReplacementTable implements PHPUnit_Ex
             return $this->fullReplacements[$value];
         }
 
-        else if (count($this->subStrReplacements)) {
+        else if (count($this->subStrReplacements) && isset($value)) {
             return str_replace(array_keys($this->subStrReplacements), array_values($this->subStrReplacements), $value);
         }
 
